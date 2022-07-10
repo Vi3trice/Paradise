@@ -17,7 +17,7 @@
   * of those are handled by the global library catalog that we will reference, and it should stay that way :)
   */
 /obj/machinery/computer/library
-	name = "Library Computer"
+	name = "\improper Library Computer"
 	anchored = TRUE
 	density = TRUE
 	icon_keyboard = null
@@ -98,6 +98,17 @@
 			to_chat(user, "<span class='notice'>[src]'s screen flashes: 'WARNING! Patron without associated account number Selected'</span>")
 		return
 	return ..()
+
+/obj/machinery/computer/screwdriver_act(mob/user, obj/item/I)
+	return
+
+/obj/machinery/computer/wrench_act(mob/user, obj/item/I)
+	. = TRUE
+	if(!I.tool_start_check(src, user, 0))
+		return
+	if(I.use_tool(src, user, 20, volume = I.tool_volume))
+		anchored = !anchored
+		to_chat(user, "<span class='notice'>You [anchored ? "secure" : "unsecure"] \the [src].</span>")
 
 /obj/machinery/computer/library/ui_interact(mob/user, ui_key = "main", datum/tgui/ui = null, force_open = TRUE, datum/tgui/master_ui = null, datum/ui_state/state = GLOB.default_state)
 	ui = SStgui.try_update_ui(user, src, ui_key, ui, force_open)
