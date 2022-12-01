@@ -181,8 +181,8 @@
 		if(3)
 			//Swarm of creatures
 			T.visible_message("<span class='userdanger'>A swarm of creatures surround [user]!</span>")
-			for(var/direction in GLOB.alldirs)
-				new /mob/living/simple_animal/hostile/netherworld(get_step(get_turf(user),direction))
+			for(var/turf/direction in T.AdjacentTurfs())
+				new /mob/living/simple_animal/hostile/netherworld(direction)
 		if(4)
 			//Destroy Equipment
 			T.visible_message("<span class='userdanger'>Everything [user] is holding and wearing disappears!</span>")
@@ -232,13 +232,11 @@
 		if(13)
 			//Mad Dosh
 			T.visible_message("<span class='userdanger'>Mad dosh shoots out of [src]!</span>")
-			var/turf/Start = get_turf(src)
-			for(var/direction in GLOB.alldirs)
-				var/turf/dirturf = get_step(Start,direction)
+			for(var/turf/direction in T.AdjacentTurfs())
 				if(prob(50))
-					new /obj/item/stack/spacecash/c1000(dirturf)
+					new /obj/item/stack/spacecash/c1000(direction)
 				else
-					var/obj/item/storage/bag/money/M = new(dirturf)
+					var/obj/item/storage/bag/money/M = new(direction)
 					for(var/i in 1 to rand(5,50))
 						new /obj/item/coin/gold(M)
 		if(14)
