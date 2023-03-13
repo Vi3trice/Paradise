@@ -131,8 +131,12 @@ GLOBAL_LIST_INIT(protected_objects, list(/obj/structure/table, /obj/structure/ca
 
 /mob/living/simple_animal/hostile/mimic/copy/death(gibbed)
 	if(can_die())
+		var/turf/T = get_turf(src)
 		for(var/atom/movable/M in src)
-			M.loc = get_turf(src)
+			M.forceMove(T)
+			if(isobj(M))
+				var/obj/O = M
+				O.obj_break(BRUTE)
 	// due to `del_on_death`
 	return ..()
 
@@ -147,7 +151,7 @@ GLOBAL_LIST_INIT(protected_objects, list(/obj/structure/table, /obj/structure/ca
 		faction |= "\ref[owner]"
 
 /mob/living/simple_animal/hostile/mimic/copy/proc/CheckObject(obj/O)
-	if((isitem(O) || isstructure(O)) && !is_type_in_list(O, GLOB.protected_objects))
+	if((isitem(O) || isstructure(O) || ismachinery(O)) && !is_type_in_list(O, GLOB.protected_objects))
 		return 1
 	return 0
 

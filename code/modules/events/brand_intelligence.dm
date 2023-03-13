@@ -39,10 +39,10 @@
 		return
 
 	if(!length(vendingMachines))	//if every machine is infected
-		for(var/thing in infectedMachines)
-			var/obj/machinery/economy/vending/upriser = thing
+		for(var/obj/machinery/economy/vending/upriser in infectedMachines)
 			if(prob(70))
-				var/mob/living/simple_animal/hostile/mimic/copy/M = new(upriser.loc, upriser, null, 1) // it will delete upriser on creation and override any machine checks
+				var/mob/living/simple_animal/hostile/mimic/copy/M = new(upriser.loc, upriser, null, FALSE)
+				RegisterSignal(upriser, COMSIG_MACHINERY_BROKEN, PROC_REF(vendor_destroyed))
 				M.faction = list("profit")
 				M.speak = rampant_speeches.Copy()
 				M.speak_chance = 15
@@ -75,6 +75,8 @@
 /datum/event/brand_intelligence/kill()
 	for(var/V in infectedMachines + vendingMachines)
 		UnregisterSignal(V, COMSIG_PARENT_QDELETING)
+		UnregisterSignal(V, COMSIG_MACHINERY_BROKEN)
+
 	infectedMachines.Cut()
 	vendingMachines.Cut()
 	. = ..()

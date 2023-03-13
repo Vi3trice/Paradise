@@ -274,6 +274,7 @@
 /obj/machinery/obj_break(damage_flag)
 	if(!(flags & NODECONSTRUCT))
 		stat |= BROKEN
+		SEND_SIGNAL(src, COMSIG_MACHINERY_BROKEN, damage_flag)
 
 /obj/machinery/proc/default_deconstruction_crowbar(user, obj/item/I, ignore_panel = 0)
 	if(I.tool_behaviour != TOOL_CROWBAR)
