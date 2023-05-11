@@ -218,17 +218,24 @@
 	gold_core_spawnable = FRIENDLY_SPAWN
 	footstep_type = FOOTSTEP_MOB_CLAW
 
-/mob/living/simple_animal/chick/New()
-	..()
+/mob/living/simple_animal/chick/Initialize(mapload)
+	. = ..()
+	GLOB.chicken_count++
 	pixel_x = rand(-6, 6)
 	pixel_y = rand(0, 10)
+
+/mob/living/simple_animal/chick/death(gibbed)
+	. = ..(gibbed)
+	if(!.)
+		return
+	GLOB.chicken_count--
 
 /mob/living/simple_animal/chick/Life(seconds, times_fired)
 	. =..()
 	if(.)
 		amount_grown += rand(1,2)
 		if(amount_grown >= 100)
-			var/mob/living/simple_animal/chicken/C = new /mob/living/simple_animal/chicken(loc)
+			var/mob/living/simple_animal/chicken/C = new /mob/living/simple_animal/chicken(loc, TRUE)
 			if(mind)
 				mind.transfer_to(C)
 			qdel(src)
@@ -280,8 +287,8 @@ GLOBAL_VAR_INIT(chicken_count, 0)
 	gold_core_spawnable = FRIENDLY_SPAWN
 	footstep_type = FOOTSTEP_MOB_CLAW
 
-/mob/living/simple_animal/chicken/New()
-	..()
+/mob/living/simple_animal/chicken/Initialize(mapload, mature = FALSE)
+	. = ..()
 	if(!body_color)
 		body_color = pick(validColors)
 	icon_state = "[icon_prefix]_[body_color]"
@@ -289,26 +296,27 @@ GLOBAL_VAR_INIT(chicken_count, 0)
 	icon_dead = "[icon_prefix]_[body_color]_dead"
 	pixel_x = rand(-6, 6)
 	pixel_y = rand(0, 10)
-	GLOB.chicken_count += 1
+	if(!mature) // They didn't grow from a chick
+		GLOB.chicken_count++
 
 /mob/living/simple_animal/chicken/death(gibbed)
 	// Only execute the below if we successfully died
 	. = ..(gibbed)
 	if(!.)
 		return
-	GLOB.chicken_count -= 1
+	GLOB.chicken_count--
 
 /mob/living/simple_animal/chicken/attackby(obj/item/O, mob/user, params)
 	if(istype(O, food_type)) //feedin' dem chickens
 		if(!stat && eggsleft < 8)
-			var/feedmsg = "[user] feeds [O] to [name]! [pick(feedMessages)]"
+			var/feedmsg = "[user] feeds [O] to [src]! [pick(feedMessages)]"
 			user.visible_message(feedmsg)
 			user.drop_item()
 			qdel(O)
 			eggsleft += rand(1, 4)
 			//world << eggsleft
 		else
-			to_chat(user, "<span class='warning'>[name] doesn't seem hungry!</span>")
+			to_chat(user, "<span class='warning'>[src] doesn't seem hungry!</span>")
 	else
 		..()
 
@@ -331,7 +339,7 @@ GLOBAL_VAR_INIT(chicken_count, 0)
 
 /obj/item/reagent_containers/food/snacks/egg/var/amount_grown = 0
 /obj/item/reagent_containers/food/snacks/egg/process()
-	if(isturf(loc))
+	if(isturf(loc) && GLOB.chicken_count < MAX_CHICKENS)
 		amount_grown += rand(1,2)
 		if(amount_grown >= 100)
 			visible_message("[src] hatches with a quiet cracking sound.")
