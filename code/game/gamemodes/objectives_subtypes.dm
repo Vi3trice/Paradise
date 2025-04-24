@@ -11,12 +11,15 @@
 	flags_target = SYNDICATE_TARGET
 
 /datum/objective/assassinate/syndicate/update_explanation_text()
-	..()
-	if(target?.current)
-		explanation_text = "Assassinate [target.current.real_name], the Syndicate agent undercover as the [target.assigned_role]."
-		if(target && length(target.antag_datums))
-			for(var/datum/antagonist/traitor/A in target.antag_datums)
-				A.queue_backstab()
+	if(!..())
+		return
+	if(target.special_role != SPECIAL_ROLE_TRAITOR) // Should it fail to find a traitor target, it falls back to a generic assassination
+		return
+
+	explanation_text = "Assassinate [target.current.real_name], the Syndicate agent undercover as the [target.assigned_role]."
+	if(length(target.antag_datums))
+		for(var/datum/antagonist/traitor/A in target.antag_datums)
+			A.queue_backstab()
 
 /datum/objective/assassinateonce/arc
 	name = "Assassinate once (ARC)"

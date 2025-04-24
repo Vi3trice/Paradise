@@ -211,6 +211,7 @@ GLOBAL_LIST_INIT(potential_theft_objectives, (subtypesof(/datum/theft_objective)
 /datum/objective/assassinate/update_explanation_text()
 	if(target?.current)
 		explanation_text = "Assassinate [target.current.real_name], the [target.assigned_role]."
+		return TRUE
 	else
 		explanation_text = "Free Objective"
 
